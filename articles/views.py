@@ -3,7 +3,7 @@ from .models import Article
 from .serializers import ArticleSerializer
 
 # Create your views here.
-class ArticleListView(ModelViewSet):
+class ArticleViewSet(ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = []

@@ -8,10 +8,18 @@ from django.contrib.auth import logout, authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
+
 # Create your views here.
 class UserViewSet(ViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    permission_classes = []
+
+    def list(self, request):
+        """Returns a list of users (required for appearing in API root)."""
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
 
     @action(methods=['post'], detail=False)
     def register(self, request):

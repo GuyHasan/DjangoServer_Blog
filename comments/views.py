@@ -13,6 +13,7 @@ from utils.parse_int import try_parse_int
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = []
 
     def create(self, request, *args, **kwargs):
         data = request.data
