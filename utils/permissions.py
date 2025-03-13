@@ -1,9 +1,6 @@
 from rest_framework.permissions import BasePermission
 
 class IsInGroup(BasePermission):
-    """
-    Allows access only to users in a specific group.
-    """
     group_name = None  # To be defined in subclasses
 
     def has_object_permission(self, request, view, obj):
@@ -24,9 +21,6 @@ class IsInGroup(BasePermission):
 # Subclasses for each group:
 class IsAdminUser(IsInGroup):
     group_name = "admin"
-
-class IsEditorUser(IsInGroup):
-    group_name = "editors"
 
 class IsRegularUser(IsInGroup):
     group_name = "users"

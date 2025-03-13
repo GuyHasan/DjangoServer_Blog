@@ -4,7 +4,9 @@ from rest_framework import status
 from .models import Comment
 from .serializers import CommentSerializer
 from utils.parse_int import try_parse_int
-
+from rest_framework.permissions import IsAuthenticated
+from utils.permissions import IsRegularUser, IsAdminUser
+from rest_framework.exceptions import MethodNotAllowed
 
 
 
@@ -14,6 +16,15 @@ class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = []
+
+    def get_permissions(self):
+        if self.action == 'create':
+            self.permission_classes = [IsAuthenticated]
+        if self.action == 'destroy':
+            self.permission_classes = [IsAdminUser, IsRegularUser]
+        if self.action == 'partial_update':
+            self.permission_classes = [IsAdminUser, IsRegularUser]
+        return super().get_permissions
 
     def create(self, request, *args, **kwargs):
         data = request.data
@@ -32,7 +43,6 @@ class CommentViewSet(ModelViewSet):
         comments = res.data
         comments_dict = {comment["id"]: comment for comment in comments}
         root_comments = []
-
         for comment in comments:
             parent_id = comment['reply_to']
             if parent_id is None:
@@ -43,6 +53,21 @@ class CommentViewSet(ModelViewSet):
                     if "replies" not in parent:
                         parent["replies"] = []
                     parent["replies"].append(comment)
-
         res.data = root_comments
         return res
+    
+
+    def partial_update(self, request, *args, **kwargs):
+        instance = self.get_object()        
+        data = request.data
+        if 'content' in data:
+            instance.content = data['content']
+            instance.save()
+            serializer = self.get_serializer(instance)
+            return Response(serializer.data)
+        
+        return Response({"detail": "Content field is required."}, status=400)
+
+
+    def update(self, request, *args, **kwargs):
+        raise MethodNotAllowed("PUT",detail="Full update is not allowed. Use PATCH instead")
