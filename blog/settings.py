@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django_filters',
     'taggit',
     'corsheaders',
+    'blog.apps.BlogConfig',
     'comments',
     'articles',
     'users',
