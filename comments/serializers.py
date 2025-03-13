@@ -9,9 +9,8 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def update(self, instance, validated_data):
-        # Ensure only 'content' can be updated during a partial update
         content = validated_data.get('content', None)
         if content:
-            instance.content = content  # Update content field
+            instance.content = content  
         instance.save()
         return instance

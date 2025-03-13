@@ -4,8 +4,9 @@ from django.contrib.auth.models import User
 from .serializers import UserSerializer
 from rest_framework.response import Response
 from rest_framework import status
-from django.contrib.auth import logout, authenticate
+from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
+from utils.permissions import IsAdminUser
 
 
 
@@ -14,6 +15,11 @@ class UserViewSet(ViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     permission_classes = []
+
+    def get_permissions(self):
+        if self.action == 'list':
+            self.permission_classes = [IsAdminUser]
+        return super().get_permissions()
 
     def list(self, request):
         """Returns a list of users (required for appearing in API root)."""
@@ -47,9 +53,6 @@ class UserViewSet(ViewSet):
                             }, status=status.HTTP_200_OK)
         return Response({'message': 'Login failed'}, status=status.HTTP_401_UNAUTHORIZED)
     
-    @action(methods=['post'], detail=False)
-    def logout(self, request):
-        logout(request)
-        return Response({'message': 'Logout success'}, status=status.HTTP_200_OK)
+
 
     

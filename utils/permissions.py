@@ -24,3 +24,6 @@ class IsAdminUser(IsInGroup):
 
 class IsRegularUser(IsInGroup):
     group_name = "users"
+
+class IsEditorUser(IsInGroup):
+    group_name = "editors"
