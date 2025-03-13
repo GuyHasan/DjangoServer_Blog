@@ -11,7 +11,7 @@ class ArticleViewSet(ModelViewSet):
     
     def get_permissions(self):
         if self.action == 'create':
-            self.permission_classes = [IsEditorUser]
+            self.permission_classes = []
         if self.action == 'destroy':
             self.permission_classes = [IsAdminUser]
         if self.action == 'partial_update':

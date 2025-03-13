@@ -17,6 +17,12 @@ class CommentViewSet(ModelViewSet):
     serializer_class = CommentSerializer
     permission_classes = []
 
+    def get_queryset(self):
+        article_id = self.request.query_params.get('article_id')
+        if article_id:
+            return Comment.objects.filter(article=article_id)
+        return Comment.objects.all()
+
     def get_permissions(self):
         if self.action == 'create':
             self.permission_classes = [IsAuthenticated]
@@ -24,7 +30,7 @@ class CommentViewSet(ModelViewSet):
             self.permission_classes = [IsAdminUser, IsRegularUser]
         if self.action == 'partial_update':
             self.permission_classes = [IsAdminUser, IsRegularUser]
-        return super().get_permissions
+        return super().get_permissions()
 
     def create(self, request, *args, **kwargs):
         data = request.data
