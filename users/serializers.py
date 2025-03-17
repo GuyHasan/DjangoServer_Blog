@@ -7,7 +7,8 @@ class UserSerializer(ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        user,_ = User.objects.get_or_create(**validated_data)
+        user= User.objects.create_user(**validated_data)
+        user.groups.add(2)
         return user
     
     def __str__(self):

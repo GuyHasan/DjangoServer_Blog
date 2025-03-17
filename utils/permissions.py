@@ -1,29 +1,23 @@
 from rest_framework.permissions import BasePermission
 
 class IsInGroup(BasePermission):
-    group_name = None  # To be defined in subclasses
+    group_names = []  # To be defined in subclasses
 
     def has_object_permission(self, request, view, obj):
-        if request.user.groups.filter(name="admin").exists():
-            return True  
-        if request.user == obj.owner:
-            return True 
-        return False  
-
+        return any(request.user.groups.filter(name=group_name).exists() for group_name in self.group_names)
+    
     def has_permission(self, request, view):
-        if not request.user or not request.user.is_authenticated:
-            return False  
-        return request.user.groups.filter(name=self.group_name).exists()
-    
-    
-
+        return any(request.user.groups.filter(name=group_name).exists() for group_name in self.group_names)
 
 # Subclasses for each group:
 class IsAdminUser(IsInGroup):
-    group_name = "admin"
+    group_names = ["admin"]
 
 class IsRegularUser(IsInGroup):
-    group_name = "users"
+    group_names = ["users"]
 
 class IsEditorUser(IsInGroup):
-    group_name = "editors"
+    group_names = ["editors"]
+
+class IsAdminOrEditorUser(IsInGroup):
+    group_names = ["admin", "editors"]

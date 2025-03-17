@@ -4,8 +4,7 @@ from rest_framework import status
 from .models import Comment
 from .serializers import CommentSerializer
 from utils.parse_int import try_parse_int
-from rest_framework.permissions import IsAuthenticated
-from utils.permissions import IsRegularUser, IsAdminUser
+from utils.permissions import IsRegularUser, IsAdminUser, IsEditorUser
 from rest_framework.exceptions import MethodNotAllowed
 
 
@@ -25,7 +24,7 @@ class CommentViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'create':
-            self.permission_classes = [IsAuthenticated]
+            self.permission_classes = [IsAdminUser, IsRegularUser]
         if self.action == 'destroy':
             self.permission_classes = [IsAdminUser, IsRegularUser]
         if self.action == 'partial_update':
