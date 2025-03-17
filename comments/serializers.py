@@ -14,3 +14,5 @@ class CommentSerializer(serializers.ModelSerializer):
             instance.content = content  
         instance.save()
         return instance
+    
+    

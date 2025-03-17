@@ -15,5 +15,5 @@ router.register(r'comments', CommentViewSet, basename='comment')
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include(router.urls)), 
-    path('api/comments/article/<int:article_id>/', CommentViewSet.as_view({'get': 'list'}), name='comments-for-article'),
-]
+    path('api/article/<int:article_id>/comment/', CommentViewSet.as_view({'get': 'list', 'post': 'create'}), name='comments-for-article'),
+    ]

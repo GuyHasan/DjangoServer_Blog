@@ -1,11 +1,11 @@
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
-from rest_framework import status
 from .models import Comment
+from articles.models import Article
 from .serializers import CommentSerializer
-from utils.parse_int import try_parse_int
-from utils.permissions import IsRegularUser, IsAdminUser, IsEditorUser
+from utils.permissions import AnyUser, IsOwner, IsOwnerOrAdmin
 from rest_framework.exceptions import MethodNotAllowed
+from rest_framework import status
 
 
 
@@ -24,23 +24,28 @@ class CommentViewSet(ModelViewSet):
 
     def get_permissions(self):
         if self.action == 'create':
-            self.permission_classes = [IsAdminUser, IsRegularUser]
+            self.permission_classes = [AnyUser]
         if self.action == 'destroy':
-            self.permission_classes = [IsAdminUser, IsRegularUser]
+            self.permission_classes = [IsOwnerOrAdmin]
         if self.action == 'partial_update':
-            self.permission_classes = [IsAdminUser, IsRegularUser]
+            self.permission_classes = [IsOwner]
         return super().get_permissions()
 
     def create(self, request, *args, **kwargs):
-        data = request.data
-        reply_to = data.get('reply_to')
-        article = try_parse_int(data.get('article'))
-        if reply_to:
-            repliedComment = Comment.objects.get(id=reply_to)
-            if (repliedComment and repliedComment.article.id != article):
-                return Response(
-                    {'error': 'Comment must be in the same article as the replied comment'}, status=status.HTTP_400_BAD_REQUEST)
-        return super().create(request, *args, **kwargs)
+        try:
+            article = Article.objects.get(id=self.kwargs['article_id'])
+        except Article.DoesNotExist:
+            return Response({"detail": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
+        
+        user = self.request.user        
+        data = request.data.copy()  
+        data['article'] = article.id  
+        data['author'] = user.id  
+
+        serializer = self.get_serializer(data=data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response({"detail": "Comment created successfully."}, status=status.HTTP_201_CREATED)
 
 
     def list(self, request, *args, **kwargs):
