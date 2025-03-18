@@ -3,9 +3,10 @@ from rest_framework.response import Response
 from .models import Comment
 from articles.models import Article
 from .serializers import CommentSerializer
-from utils.permissions import AnyUser, IsOwner, IsOwnerOrAdmin
+from utils.permissions import AnyUser, IsOwner, IsAdminUser
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import status
+from rest_framework.exceptions import NotFound
 
 
 
@@ -17,8 +18,10 @@ class CommentViewSet(ModelViewSet):
     permission_classes = []
 
     def get_queryset(self):
-        article_id = self.request.query_params.get('article_id')
+        article_id = self.kwargs.get('article_id')
         if article_id:
+            if not Article.objects.filter(id=article_id).exists():
+                raise NotFound({"detail": "Article not found."})  
             return Comment.objects.filter(article=article_id)
         return Comment.objects.all()
 
@@ -26,7 +29,7 @@ class CommentViewSet(ModelViewSet):
         if self.action == 'create':
             self.permission_classes = [AnyUser]
         if self.action == 'destroy':
-            self.permission_classes = [IsOwnerOrAdmin]
+            self.permission_classes = [IsAdminUser]
         if self.action == 'partial_update':
             self.permission_classes = [IsOwner]
         return super().get_permissions()
@@ -35,7 +38,7 @@ class CommentViewSet(ModelViewSet):
         try:
             article = Article.objects.get(id=self.kwargs['article_id'])
         except Article.DoesNotExist:
-            return Response({"detail": "Article not found."}, status=status.HTTP_404_NOT_FOUND)
+            return NotFound({"detail": "Article not found."})
         
         user = self.request.user        
         data = request.data.copy()  
