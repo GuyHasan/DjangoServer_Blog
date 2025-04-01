@@ -58,3 +58,4 @@ class ArticleViewSet(ModelViewSet):
         obj = self.get_object()
         self.check_object_permissions(request, obj)
         return super().partial_update(request, *args, **kwargs)
+

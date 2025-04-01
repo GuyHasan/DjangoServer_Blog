@@ -7,7 +7,7 @@ from utils.permissions import AnyUser, IsOwner, IsAdminUser
 from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import status
 from rest_framework.exceptions import NotFound
-
+from django.utils.functional import SimpleLazyObject
 
 
 # Create your views here.
@@ -33,23 +33,30 @@ class CommentViewSet(ModelViewSet):
         if self.action == 'partial_update':
             self.permission_classes = [IsOwner]
         return super().get_permissions()
+    
+    
 
     def create(self, request, *args, **kwargs):
+        if request.parser_context["kwargs"].get("article_id") is None:
+            return Response(
+                {"error": "Direct comment creation is not allowed. Use /api/articles/{article_id}/comments/ instead."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
         try:
             article = Article.objects.get(id=self.kwargs['article_id'])
         except Article.DoesNotExist:
             return NotFound({"detail": "Article not found."})
-        
-        user = self.request.user        
-        data = request.data.copy()  
-        data['article'] = article.id  
+        user = request.user
+        if isinstance(user, SimpleLazyObject):
+            user = user._wrapped  
+        data = request.data.copy()
         data['author'] = user.id  
 
         serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return Response({"detail": "Comment created successfully."}, status=status.HTTP_201_CREATED)
+        serializer.save(article=article, author=user)
 
+        return Response({"detail": "Comment created successfully."}, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
         res = super().list(request, *args, **kwargs)
@@ -71,16 +78,25 @@ class CommentViewSet(ModelViewSet):
     
 
     def partial_update(self, request, *args, **kwargs):
-        instance = self.get_object()        
+        instance = self.get_object()
         data = request.data
+
+        # Check if there are any fields other than 'content'
+        if set(data.keys()) - {'content'}:
+            return Response({"detail": "Only 'content' field is allowed to be updated."}, status=400)
+
         if 'content' in data:
             instance.content = data['content']
             instance.save()
             serializer = self.get_serializer(instance)
-            return Response(serializer.data)
-        
-        return Response({"detail": "Content field is required."}, status=400)
+            return Response(serializer.data , status=200)
 
+        return Response({"detail": "Content field is required."}, status=400)
 
     def update(self, request, *args, **kwargs):
         raise MethodNotAllowed("PUT",detail="Full update is not allowed. Use PATCH instead")
+
+        
+    
+
+
