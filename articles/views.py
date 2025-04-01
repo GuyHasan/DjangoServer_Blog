@@ -4,14 +4,39 @@ from .serializers import ArticleSerializer
 from utils.permissions import  IsAdminUser, IsAdminOrEditorUser
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
+from utils.filter_classes import ArticleFilter
 
-# Create your views here.
+
+
+class ArticlePagination(PageNumberPagination):
+    page_size = 6
+    page_size_query_param = 'page_size'  
+    max_page_size = 36  
+
+    def get_page_size(self, request):
+        """
+        This method determines the page size. If it's the first page, return 3, otherwise return 6.
+        """
+        if 'page' in request.query_params:
+            page_number = int(request.query_params.get('page'))
+        else:
+            page_number = 1  
+
+        if page_number == 1:
+            return 3
+        return 6 
+
+
 class ArticleViewSet(ModelViewSet):
     queryset = Article.objects.all()
     serializer_class = ArticleSerializer
     permission_classes = []
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    search_fields = ['title', 'content', 'tags', 'author']
+    filterset_class = ArticleFilter
+    filterset_fields = ['author', 'tags']
+    search_fields = ['title', 'content', 'tags__name', 'author__username']
+    pagination_class = ArticlePagination
     
     def get_permissions(self):
         if self.action == 'create':
@@ -23,22 +48,6 @@ class ArticleViewSet(ModelViewSet):
         if self.action == 'update':
             self.permission_classes = [IsAdminOrEditorUser]
         return super().get_permissions()
-    
-    def get_queryset(self):
-        queryset =  super().get_queryset()
-        title = self.request.query_params.get('title', None)
-        content = self.request.query_params.get('content', None)
-        tags = self.request.query_params.get('tags', None)
-        author = self.request.query_params.get('author', None)
-        if title:
-            queryset = queryset.filter(title__icontains=title)
-        if content:
-            queryset = queryset.filter(content__icontains=content)
-        if tags:
-            queryset = queryset.filter(tags__icontains=tags)
-        if author:
-            queryset = queryset.filter(author__username=author)
-        return queryset
     
 
     def destroy(self, request, *args, **kwargs):

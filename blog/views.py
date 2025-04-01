@@ -12,9 +12,12 @@ class CustomApiRootView(APIView):
         return Response(
             {
             'message': 'Welcome to the API!',
+            'note': 'This is API mapping , you can use it to get the endpoints',
             'endpoints': {
                 'articles': {
-                    'list': f'{api_url}api/articles/',
+                    'list(first page)': f'{api_url}api/articles/',
+                    'list search': f'{api_url}api/articles/?search=<str:search>',
+                    'list page': f'{api_url}api/articles/?page=<int:page_number>',
                     'detail': f'{api_url}api/articles/<int:id>/',
                     'comments': f'{api_url}api/article/<int:article_id>/comments/',
                 },

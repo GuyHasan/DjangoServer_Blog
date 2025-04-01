@@ -9,7 +9,6 @@ from rest_framework import status
 from rest_framework.exceptions import NotFound
 from django.utils.functional import SimpleLazyObject
 
-
 # Create your views here.
 
 class CommentViewSet(ModelViewSet):
@@ -60,11 +59,11 @@ class CommentViewSet(ModelViewSet):
 
     def list(self, request, *args, **kwargs):
         res = super().list(request, *args, **kwargs)
-        comments = res.data
+        comments = res.data.get('results', [])
         comments_dict = {comment["id"]: comment for comment in comments}
         root_comments = []
         for comment in comments:
-            parent_id = comment['reply_to']
+            parent_id = comment.get('reply_to')
             if parent_id is None:
                 root_comments.append(comment)
             else:

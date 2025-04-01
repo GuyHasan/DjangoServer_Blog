@@ -16,9 +16,10 @@ class UserViewSet(ViewSet):
     permission_classes = []
 
 
-    @action(detail=False, methods=['get'], permission_classes=[IsAdminUser])
     def list(self, request):
         """Returns a list of users (required for appearing in API root)."""
+        self.permission_classes = [IsAdminUser]
+        self.check_permissions(request)  
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
