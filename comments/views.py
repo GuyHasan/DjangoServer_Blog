@@ -8,13 +8,20 @@ from rest_framework.exceptions import MethodNotAllowed
 from rest_framework import status
 from rest_framework.exceptions import NotFound
 from django.utils.functional import SimpleLazyObject
+from rest_framework.pagination import PageNumberPagination
 
-# Create your views here.
+
+
+class CommentPagination(PageNumberPagination):
+    page_size = 1000
+    page_size_query_param = 'page_size'
+    max_page_size = 1000
 
 class CommentViewSet(ModelViewSet):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
     permission_classes = []
+    pagination_class = CommentPagination
 
     def get_queryset(self):
         article_id = self.kwargs.get('article_id')
