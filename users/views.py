@@ -1,12 +1,13 @@
 from rest_framework.viewsets import ViewSet
 from rest_framework.decorators import action
 from django.contrib.auth.models import User
-from .serializers import UserSerializer ,LoginSerializer
+from .serializers import UserSerializer ,LoginSerializer 
 from rest_framework.response import Response
 from rest_framework import status
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 from utils.permissions import IsAdminUser
+
 
 
 
@@ -49,6 +50,8 @@ class UserViewSet(ViewSet):
                     password=serializer.validated_data['password'])
             if user:
                 token = RefreshToken.for_user(user)
+                token['groups'] = [group.name for group in user.groups.all()]
+                token['username'] = user.username
                 return Response({
                     'message': 'Login successful',
                     'refresh': str(token),
@@ -56,5 +59,4 @@ class UserViewSet(ViewSet):
                 }, status=status.HTTP_200_OK)
         return Response({'message': 'Login failed'}, status=status.HTTP_401_UNAUTHORIZED)
     
-
 

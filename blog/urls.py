@@ -4,6 +4,7 @@ from .views import CustomApiRootView
 from users.views import UserViewSet
 from articles.views import ArticleViewSet
 from comments.views import CommentViewSet
+from rest_framework_simplejwt.views import TokenRefreshView
 from django.contrib import admin
 
 router = DefaultRouter()
@@ -21,4 +22,5 @@ urlpatterns = [
     path('api/users/', UserViewSet.as_view({'get': 'list'}), name='users'),
     path('api/login/', UserViewSet.as_view({'post': 'login'}), name='login'),
     path('api/register/', UserViewSet.as_view({'post': 'register'}), name='register'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     ]

@@ -30,6 +30,7 @@ class CustomApiRootView(APIView):
                     'list': f'{api_url}api/users/',
                     'login': f'{api_url}api/login/',
                     'register': f'{api_url}api/register/',
+                    'token_refresh': f'{api_url}api/token/refresh/',
                 }
                 ,
             }

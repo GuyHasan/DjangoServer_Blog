@@ -8,7 +8,8 @@ SECRET_KEY = config("SECRET_KEY", default="your-default-secret-key")
 DEBUG = config("DEBUG", default=False, cast=bool)
 
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['localhost','127.0.0.1']
+APPEND_SLASH = False  # Prevents Django from adding trailing slashes
 
 
 # Application definition
@@ -24,15 +25,16 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt',
     'django_filters',
     'taggit',
-    'corsheaders',
     'blog.apps.BlogConfig',
     'comments',
     'articles',
     'users',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -40,6 +42,17 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+CORS_ALLOW_CREDENTIALS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://sub.example.com",
+    "http://localhost:8000",
+    "http://127.0.0.1:5173",
+    "http://localhost:5173",
+]
+
 
 ROOT_URLCONF = 'blog.urls'
 

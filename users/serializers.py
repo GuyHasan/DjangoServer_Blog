@@ -40,3 +40,4 @@ class UserSerializer(ModelSerializer):
 class LoginSerializer(Serializer):
     username = CharField()
     password = CharField(write_only=True)
+
