@@ -257,16 +257,7 @@ Below is an overview of the main routes available in your API, along with their 
    The Django backend will be available at [http://127.0.0.1:8000](http://127.0.0.1:8000).
 
 ### **Frontend (React/Vite)**
-1. **Install Dependencies:**
-   ```bash
-   npm install
-   ```
-
-2. **Run the Development Server:**
-   ```bash
-   npm run dev
-   ```
-   The frontend will be available at [http://localhost:5173](http://localhost:5173).
+For matching frontend client using react , check out https://github.com/GuyHasan/ReactClient_Blog .
 
 ---
 
