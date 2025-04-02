@@ -62,7 +62,7 @@ class CommentViewSet(ModelViewSet):
         serializer.is_valid(raise_exception=True)
         serializer.save(article=article, author=user)
 
-        return Response({"detail": "Comment created successfully."}, status=status.HTTP_201_CREATED)
+        return Response({"detail": "Comment created successfully.", "comment": serializer.data}, status=status.HTTP_201_CREATED)
 
     def list(self, request, *args, **kwargs):
         res = super().list(request, *args, **kwargs)

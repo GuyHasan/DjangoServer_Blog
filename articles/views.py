@@ -10,22 +10,10 @@ from utils.filter_classes import ArticleFilter
 
 
 class ArticlePagination(PageNumberPagination):
-    page_size = 6
+    page_size =3
     page_size_query_param = 'page_size'  
     max_page_size = 36  
 
-    def get_page_size(self, request):
-        """
-        This method determines the page size. If it's the first page, return 3, otherwise return 6.
-        """
-        if 'page' in request.query_params:
-            page_number = int(request.query_params.get('page'))
-        else:
-            page_number = 1  
-
-        if page_number == 1:
-            return 3
-        return 6 
 
 
 class ArticleViewSet(ModelViewSet):
@@ -49,6 +37,14 @@ class ArticleViewSet(ModelViewSet):
             self.permission_classes = [IsAdminOrEditorUser]
         return super().get_permissions()
     
+    def list(self, request, *args, **kwargs):
+        queryset = self.filter_queryset(self.get_queryset().order_by('-publish_date'))
+        page = self.paginate_queryset(queryset)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data)
 
     def destroy(self, request, *args, **kwargs):
         response = super().destroy(request, *args, **kwargs)
