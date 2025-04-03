@@ -155,6 +155,59 @@ Below is an overview of the main routes available in your API, along with their 
 
 ---
 
+## Initial Data
+
+This project comes with pre-populated sample data to help you get started quickly. When you set up the Django backend, the following initial data is already available:
+
+### **Users**
+
+Three users are registered with the following credentials and roles:
+
+- **admin_user**  
+  - **Password:** `adminpassword`  
+  - **Role:** Admin user  
+  - Has full administrative privileges.
+
+- **editor_user**  
+  - **Password:** `editorpassword`  
+  - **Role:** Editor user  
+  - Can create articles.
+
+- **regular_user**  
+  - **Password:** `userpassword`  
+  - **Role:** Regular user  
+  - Has standard reading and commenting permissions.
+
+### **Articles**
+
+There are 2 articles in the database:
+
+- **Article 1:**  
+  - **Author:** admin_user  
+  - Created by the admin user.
+
+- **Article 2:**  
+  - **Author:** editor_user  
+  - Created by the editor user.
+
+### **Comments**
+
+Each article has 3 comments – one by each registered user:
+
+- For **Article 1:**  
+  - A comment by **admin_user**  
+  - A comment by **editor_user**  
+  - A comment by **regular_user**
+
+- For **Article 2:**  
+  - A comment by **admin_user**  
+  - A comment by **editor_user**  
+  - A comment by **regular_user**
+
+These initial data entries are intended to help you test and explore the API endpoints immediately after setup. Feel free to modify or extend this data as needed for your development and testing purposes.
+
+---
+
 ## Expected Request/Response Formats
 
 ### **Articles**
